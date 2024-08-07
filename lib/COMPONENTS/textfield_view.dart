@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:iic_app_template_flutter/FUNCTIONS/colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class TextfieldView extends StatefulWidget {
   final bool isAutoCorrect;
   final bool isAutoFocus;
   final String placeholder;
+  final Color placeholderColor;
   final double size;
   final Color color;
   final Color backgroundColor;
@@ -19,13 +20,14 @@ class TextfieldView extends StatefulWidget {
   final int maxLines;
   final int minLines;
   final bool isPassword;
-  final ValueChanged<String>? onChanged; // Add a callback for text change
+  final TextEditingController controller;
 
   const TextfieldView({
     super.key,
     this.isAutoCorrect = false,
     this.isAutoFocus = false,
     this.placeholder = "Enter text here...",
+    this.placeholderColor = Colors.grey,
     this.size = 16,
     this.color = Colors.black,
     this.backgroundColor = Colors.black12,
@@ -40,7 +42,7 @@ class TextfieldView extends StatefulWidget {
     this.maxLines = 1,
     this.minLines = 1,
     this.isPassword = false,
-    this.onChanged, // Initialize the callback
+    required this.controller,
   });
 
   @override
@@ -48,50 +50,49 @@ class TextfieldView extends StatefulWidget {
 }
 
 class _TextfieldViewState extends State<TextfieldView> {
-  late TextEditingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController();
-  }
-
   @override
   void dispose() {
-    _controller.dispose();
+    widget.controller.dispose();
     super.dispose();
+  }
+
+  void clearText() {
+    setState(() {
+      widget.controller.clear();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      // Ensure there is a Material widget
+      color: Colors.transparent, // Ensure Material background is transparent
       child: Container(
         decoration: BoxDecoration(
           color: widget.backgroundColor,
           borderRadius: BorderRadius.circular(widget.radius),
+          border: widget.borderWidth > 0
+              ? Border.all(color: widget.borderColor, width: widget.borderWidth)
+              : null,
         ),
         child: TextField(
-          controller: _controller,
-          onChanged: widget.onChanged, // Use the callback for text change
+          controller: widget.controller,
           autocorrect: widget.isAutoCorrect,
           autofocus: widget.isAutoFocus,
           decoration: InputDecoration(
             hintText: widget.placeholder,
+            hintStyle: GoogleFonts.inconsolata(color: widget.placeholderColor),
             contentPadding: EdgeInsets.symmetric(
               vertical: widget.paddingV,
               horizontal: widget.paddingH,
             ),
-            border: widget.borderWidth == 0
-                ? InputBorder.none
-                : OutlineInputBorder(
-                    borderSide: BorderSide(
-                        width: widget.borderWidth, color: widget.borderColor),
-                    borderRadius: BorderRadius.circular(widget.radius)),
+            border: InputBorder.none,
           ),
           enabled: widget.enabled,
           keyboardType: widget.keyboardType,
-          style: TextStyle(fontSize: widget.size, color: widget.color),
+          style: GoogleFonts.inconsolata(
+            fontSize: widget.size,
+            color: widget.color,
+          ),
           maxLength: widget.max > 0 ? widget.max : null,
           maxLines: widget.isPassword ? 1 : widget.maxLines,
           minLines: widget.minLines,

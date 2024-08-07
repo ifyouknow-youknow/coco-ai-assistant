@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:iic_app_template_flutter/FUNCTIONS/colors.dart';
+import 'package:coco_ai_assistant/FUNCTIONS/colors.dart';
 
 class CheckboxView extends StatefulWidget {
   final ValueChanged<bool> onChange;

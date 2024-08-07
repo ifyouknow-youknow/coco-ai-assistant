@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import 'package:iic_app_template_flutter/COMPONENTS/text_view.dart';
+import 'package:coco_ai_assistant/COMPONENTS/text_view.dart';
 
 class LoadingView extends StatelessWidget {
   const LoadingView({super.key});

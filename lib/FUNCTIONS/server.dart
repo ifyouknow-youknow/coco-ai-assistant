@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:iic_app_template_flutter/MODELS/constants.dart';
+import 'package:coco_ai_assistant/MODELS/constants.dart';
 
 Future<dynamic> server_POST(String endpoint, Map<String, dynamic> data) async {
   try {

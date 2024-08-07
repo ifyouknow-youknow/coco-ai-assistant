@@ -1,9 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:iic_app_template_flutter/MODELS/firebase.dart';
-import 'package:iic_app_template_flutter/VIEWS/playground.dart';
-import 'package:iic_app_template_flutter/firebase_options.dart';
+import 'package:coco_ai_assistant/MODELS/firebase.dart';
+import 'package:coco_ai_assistant/VIEWS/home.dart';
+import 'package:coco_ai_assistant/VIEWS/playground.dart';
+import 'package:coco_ai_assistant/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +15,7 @@ void main() async {
   await dotenv.load(fileName: "lib/.env");
 
   runApp(const MaterialApp(
-    home: PlaygroundView(),
+    home: Home(),
     // initialRoute: "/",
     // routes: {
     //   // "/": (context) => const PlaygroundView(),
