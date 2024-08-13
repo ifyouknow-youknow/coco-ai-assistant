@@ -92,3 +92,11 @@ int daysBetweenDates(DateTime date1, DateTime date2) {
 
   return diffDays;
 }
+
+DateTime startOfDay(DateTime date) {
+  return DateTime.utc(date.year, date.month, date.day);
+}
+
+DateTime endOfDay(DateTime date) {
+  return DateTime.utc(date.year, date.month, date.day, 23, 59, 59, 999);
+}

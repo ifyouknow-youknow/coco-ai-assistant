@@ -1,3 +1,5 @@
+import 'package:coco_ai_assistant/COMPONENTS/button_view.dart';
+import 'package:coco_ai_assistant/COMPONENTS/text_view.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -19,6 +21,7 @@ class TextfieldView extends StatefulWidget {
   final int max;
   final int maxLines;
   final int minLines;
+  final bool multiline;
   final bool isPassword;
   final TextEditingController controller;
 
@@ -41,6 +44,7 @@ class TextfieldView extends StatefulWidget {
     this.max = 0,
     this.maxLines = 1,
     this.minLines = 1,
+    this.multiline = false,
     this.isPassword = false,
     required this.controller,
   });
@@ -50,8 +54,21 @@ class TextfieldView extends StatefulWidget {
 }
 
 class _TextfieldViewState extends State<TextfieldView> {
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Add listener to the FocusNode to trigger rebuild when focus changes
+    _focusNode.addListener(() {
+      setState(() {}); // Trigger a rebuild when focus changes
+    });
+  }
+
   @override
   void dispose() {
+    _focusNode.dispose();
     widget.controller.dispose();
     super.dispose();
   }
@@ -62,42 +79,83 @@ class _TextfieldViewState extends State<TextfieldView> {
     });
   }
 
+  void _dismissKeyboard() {
+    _focusNode.unfocus(); // Dismisses the keyboard
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent, // Ensure Material background is transparent
-      child: Container(
-        decoration: BoxDecoration(
-          color: widget.backgroundColor,
-          borderRadius: BorderRadius.circular(widget.radius),
-          border: widget.borderWidth > 0
-              ? Border.all(color: widget.borderColor, width: widget.borderWidth)
-              : null,
-        ),
-        child: TextField(
-          controller: widget.controller,
-          autocorrect: widget.isAutoCorrect,
-          autofocus: widget.isAutoFocus,
-          decoration: InputDecoration(
-            hintText: widget.placeholder,
-            hintStyle: GoogleFonts.inconsolata(color: widget.placeholderColor),
-            contentPadding: EdgeInsets.symmetric(
-              vertical: widget.paddingV,
-              horizontal: widget.paddingH,
+    return GestureDetector(
+      behavior: HitTestBehavior
+          .opaque, // Ensures GestureDetector detects taps outside of children
+      onTap: () {
+        // Dismiss keyboard and remove focus when tapping outside the TextField
+        _dismissKeyboard();
+      },
+      child: Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: widget.backgroundColor,
+              borderRadius: BorderRadius.circular(widget.radius),
+              border: widget.borderWidth > 0
+                  ? Border.all(
+                      color: widget.borderColor, width: widget.borderWidth)
+                  : null,
             ),
-            border: InputBorder.none,
+            child: TextField(
+              controller: widget.controller,
+              focusNode: _focusNode,
+              autocorrect: widget.isAutoCorrect,
+              autofocus: widget.isAutoFocus,
+              decoration: InputDecoration(
+                hintText: widget.placeholder,
+                hintStyle:
+                    GoogleFonts.inconsolata(color: widget.placeholderColor),
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: widget.paddingV,
+                  horizontal: widget.paddingH,
+                ),
+                border: InputBorder.none,
+              ),
+              enabled: widget.enabled,
+              keyboardType: widget.multiline
+                  ? TextInputType.multiline
+                  : widget.keyboardType,
+              style: GoogleFonts.inconsolata(
+                fontSize: widget.size,
+                color: widget.color,
+              ),
+              textInputAction: widget.multiline
+                  ? TextInputAction.newline
+                  : TextInputAction.done,
+              maxLength: widget.max > 0 ? widget.max : null,
+              maxLines: widget.isPassword ? 1 : widget.maxLines,
+              minLines: widget.minLines,
+              obscureText: widget.isPassword,
+            ),
           ),
-          enabled: widget.enabled,
-          keyboardType: widget.keyboardType,
-          style: GoogleFonts.inconsolata(
-            fontSize: widget.size,
-            color: widget.color,
-          ),
-          maxLength: widget.max > 0 ? widget.max : null,
-          maxLines: widget.isPassword ? 1 : widget.maxLines,
-          minLines: widget.minLines,
-          obscureText: widget.isPassword,
-        ),
+          // Show "Done" button only if the TextField is focused
+          if (_focusNode.hasFocus)
+            SizedBox(
+              width: double.infinity,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  ButtonView(
+                    onPress: _dismissKeyboard,
+                    child: TextView(
+                      text: 'done',
+                      color: widget.color,
+                      size: 20,
+                      font: 'inconsolata',
+                      weight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
       ),
     );
   }

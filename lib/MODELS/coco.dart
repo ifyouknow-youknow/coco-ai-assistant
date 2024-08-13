@@ -94,15 +94,14 @@ Future<ChatSession> coco_StartCustomChat(
 Future<String?> coco_SendChat(
     ChatSession chat, String message, Map<String, Function> functions) async {
   try {
-    print(functions);
     final response = await chat.sendMessage(Content.text(message));
     final text = response.text ?? "No response";
-
     final functionCalls = response.functionCalls.toList();
 
     if (functionCalls.isNotEmpty) {
       final functionCall = functionCalls.first;
       final functionName = functionCall.name;
+      print('COCO - FUNCTION CALLED: $functionName');
       final functionArgs = functionCall.args;
       final functionResponse = functions[functionName]!(functionArgs, chat);
       return functionResponse;

@@ -3,8 +3,16 @@ import 'package:coco_ai_assistant/COMPONENTS/button_view.dart';
 import 'package:coco_ai_assistant/COMPONENTS/roundedcorners_view.dart';
 import 'package:coco_ai_assistant/COMPONENTS/scrollable_view.dart';
 import 'package:coco_ai_assistant/COMPONENTS/textfield_view.dart';
+import 'package:coco_ai_assistant/FUNCTIONS/nav.dart';
+import 'package:coco_ai_assistant/MASTER/datamaster.dart';
+import 'package:coco_ai_assistant/MODELS/firebase.dart';
 import 'package:coco_ai_assistant/MODELS/screen.dart';
+import 'package:coco_ai_assistant/VIEWS/WIDGETS/flashcards_widget.dart';
+import 'package:coco_ai_assistant/VIEWS/WIDGETS/journal_widget.dart';
+import 'package:coco_ai_assistant/VIEWS/WIDGETS/notes_widget.dart';
+import 'package:coco_ai_assistant/VIEWS/WIDGETS/tasks_widget.dart';
 import 'package:coco_ai_assistant/VIEWS/coco_type.dart';
+import 'package:coco_ai_assistant/VIEWS/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:coco_ai_assistant/COMPONENTS/loading_view.dart';
 import 'package:coco_ai_assistant/COMPONENTS/padding_view.dart';
@@ -12,45 +20,45 @@ import 'package:coco_ai_assistant/COMPONENTS/text_view.dart';
 import 'package:coco_ai_assistant/FUNCTIONS/colors.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  DataMaster dm;
+  Home({super.key, required this.dm});
 
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-// VARIABLES
-  String _textCommand = "";
-
-  // TOGGLES
-  bool _toggleLoading = false;
-  bool _toggleShowOptions = false;
-  //
-  bool _toggleShowType = false;
-
-  void onToggleClose() {
-    setState(() {
-      _toggleShowType = false;
-    });
+  void init() async {
+    // auth_SignOut();
+    final user = await auth_CheckUser();
+    if (user == null) {
+      nav_PushAndRemove(context, SignUp(dm: widget.dm));
+    } else {
+      setState(() {
+        widget.dm.setUserId(user.uid);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    init();
     return Scaffold(
-      backgroundColor: hexToColor("#1D1F24"),
+      backgroundColor: hexToColor(widget.dm.backgroundColor),
       body: Stack(
         children: [
           // MAIN
           SizedBox(
             height: getHeight(context),
             width: getWidth(context),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
+                // TOP
+                const SizedBox(
                   height: 50,
                 ),
-                PaddingView(
+                const PaddingView(
                   paddingTop: 0,
                   paddingBottom: 0,
                   child: Column(
@@ -70,14 +78,37 @@ class _HomeState extends State<Home> {
                       )
                     ],
                   ),
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        TasksWidget(
+                          dm: widget.dm,
+                        ),
+                        NotesWidget(dm: widget.dm),
+                        FlashcardsWidget(dm: widget.dm),
+                        JournalWiget(
+                          dm: widget.dm,
+                        ),
+                        const SizedBox(
+                          height: 100,
+                        ),
+                      ],
+                    ),
+                  ),
                 )
+                // BODY
               ],
             ),
           ),
 
           // ABSOLUTE
           //
-          if (_toggleShowOptions)
+          if (widget.dm.toggleShowOptions)
             Positioned(
               bottom: 40,
               right: 12,
@@ -94,7 +125,7 @@ class _HomeState extends State<Home> {
                           ),
                           onPress: () {
                             setState(() {
-                              _toggleShowOptions = false;
+                              widget.dm.setToggleShowOptions(false);
                             });
                           }),
                       const SizedBox(
@@ -118,9 +149,9 @@ class _HomeState extends State<Home> {
                           ),
                           onPress: () {
                             setState(() {
-                              _toggleShowOptions = false;
-                              _toggleShowType = true;
+                              widget.dm.setToggleShowOptions(false);
                             });
+                            nav_Push(context, CocoType(dm: widget.dm));
                           }),
                       const SizedBox(
                         width: 10,
@@ -132,16 +163,16 @@ class _HomeState extends State<Home> {
                 ],
               ),
             ),
-          if (!_toggleShowOptions)
+          if (!widget.dm.toggleShowOptions)
             Positioned(
                 bottom: 40,
                 right: 12,
                 child: ButtonView(
                   radius: 100,
-                  backgroundColor: Colors.white10,
+                  backgroundColor: hexToColor("#000000"),
                   onPress: () {
                     setState(() {
-                      _toggleShowOptions = true;
+                      widget.dm.setToggleShowOptions(true);
                     });
                   },
                   child: const PaddingView(
@@ -158,12 +189,8 @@ class _HomeState extends State<Home> {
                   ),
                 )),
           //
-          if (_toggleShowType)
-            CocoType(
-              onToggleClose: onToggleClose,
-            ),
           // TOGGLES
-          if (_toggleLoading) const LoadingView()
+          if (widget.dm.toggleLoading) const LoadingView()
         ],
       ),
     );

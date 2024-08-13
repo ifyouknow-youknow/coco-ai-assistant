@@ -1,3 +1,7 @@
+import 'package:coco_ai_assistant/FUNCTIONS/misc.dart';
+import 'package:coco_ai_assistant/FUNCTIONS/nav.dart';
+import 'package:coco_ai_assistant/MASTER/datamaster.dart';
+import 'package:coco_ai_assistant/VIEWS/signup.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -13,9 +17,15 @@ void main() async {
   );
   messaging_SetUp();
   await dotenv.load(fileName: "lib/.env");
-
-  runApp(const MaterialApp(
-    home: Home(),
+  final user = await auth_CheckUser();
+  print(user);
+  final dm = DataMaster();
+  runApp(MaterialApp(
+    home: user != null
+        ? Home(
+            dm: dm,
+          )
+        : SignUp(dm: dm),
     // initialRoute: "/",
     // routes: {
     //   // "/": (context) => const PlaygroundView(),

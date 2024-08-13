@@ -20,7 +20,8 @@ class LoadingView extends StatelessWidget {
               TextView(
                 text: "One moment please...",
                 color: Colors.white,
-                size: 16,
+                size: 20,
+                font: 'inconsolata',
               ),
               SizedBox(
                 height: 10,
