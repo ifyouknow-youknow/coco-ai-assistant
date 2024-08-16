@@ -23,6 +23,7 @@ class TextfieldView extends StatefulWidget {
   final int minLines;
   final bool multiline;
   final bool isPassword;
+  final bool isCap; // New field for capitalization
   final TextEditingController controller;
 
   const TextfieldView({
@@ -35,7 +36,7 @@ class TextfieldView extends StatefulWidget {
     this.color = Colors.black,
     this.backgroundColor = Colors.black12,
     this.paddingV = 10,
-    this.paddingH = 16,
+    this.paddingH = 0,
     this.enabled = true,
     this.borderWidth = 0,
     this.borderColor = Colors.black,
@@ -46,6 +47,7 @@ class TextfieldView extends StatefulWidget {
     this.minLines = 1,
     this.multiline = false,
     this.isPassword = false,
+    this.isCap = false, // Default value
     required this.controller,
   });
 
@@ -59,8 +61,6 @@ class _TextfieldViewState extends State<TextfieldView> {
   @override
   void initState() {
     super.initState();
-
-    // Add listener to the FocusNode to trigger rebuild when focus changes
     _focusNode.addListener(() {
       setState(() {}); // Trigger a rebuild when focus changes
     });
@@ -133,10 +133,13 @@ class _TextfieldViewState extends State<TextfieldView> {
               maxLines: widget.isPassword ? 1 : widget.maxLines,
               minLines: widget.minLines,
               obscureText: widget.isPassword,
+              textCapitalization: widget.isCap
+                  ? TextCapitalization.sentences
+                  : TextCapitalization.none, // Toggle capitalization
             ),
           ),
           // Show "Done" button only if the TextField is focused
-          if (_focusNode.hasFocus)
+          if (_focusNode.hasFocus && widget.multiline)
             SizedBox(
               width: double.infinity,
               child: Row(

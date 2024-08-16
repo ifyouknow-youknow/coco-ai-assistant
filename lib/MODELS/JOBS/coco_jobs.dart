@@ -3,6 +3,7 @@ import 'package:coco_ai_assistant/FUNCTIONS/misc.dart';
 import 'package:coco_ai_assistant/MODELS/coco.dart';
 import 'package:coco_ai_assistant/MODELS/constants.dart';
 import 'package:coco_ai_assistant/MODELS/firebase.dart';
+import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 const tasksInstructions =
@@ -21,7 +22,7 @@ final declarationCreateTask = FunctionDeclaration(
       'userId': Schema(SchemaType.string, description: 'The id of the user.'),
       'task': Schema(SchemaType.string,
           description:
-              'The task in tet form. This should be generalized and based on what the user says.'),
+              'The task in text form. This should be generalized and based on what the user says. Keep the task text exactly how the user types it.'),
       'category': Schema(SchemaType.string,
           description:
               'The category that the task belongs in. Do not use category names that are too unique so you can put multiple tasks in a category if they fit such as Work, Personal, etc.'),
@@ -45,7 +46,7 @@ final declarationCreateTask = FunctionDeclaration(
 );
 final declarationUpdateTask = FunctionDeclaration(
   'updateTask',
-  'Update or change an existing task a new task record from the database. Use the original id of the task. Do not ask for the id, you will be provided the ids. Only call if the user wants to update and not create a task. If you do not have any tasks in your history, call the getTasks function first.',
+  'Update or change an existing task record from the database. Use the original id of the task. Do not ask for the id, you will be provided the ids. Only call if the user wants to update and not create a task. If you do not have any tasks in your history, call the getTasks function first. Make sure the values match any new values, if not changed, leave it the same.',
   Schema(
     SchemaType.object,
     properties: {
@@ -55,12 +56,12 @@ final declarationUpdateTask = FunctionDeclaration(
       'userId': Schema(SchemaType.string, description: 'The id of the user.'),
       'task': Schema(SchemaType.string,
           description:
-              'The task in tet form. This should be generalized and based on what the user says.'),
+              'The task provided that needs to be updated. Keep the task text exactly how the user types it.'),
       'category':
           Schema(SchemaType.string, description: 'The category that the task.'),
       'date': Schema(SchemaType.string,
           description:
-              'The date this task is meant to be completed on. If no date is specified, set today as the date. Make sure it is in this format: “2024-08-05T12:34:56Z”.'),
+              'The date this task needs to be changed to. If no date is specified, set today as the date. Make sure it is in this format: “2024-08-05T12:34:56Z”.'),
       'priority': Schema(SchemaType.string,
           description: 'The priority of this task. Set to LOW as default.'),
       'status': Schema(SchemaType.string,
@@ -131,6 +132,35 @@ final declarationGetAllJournalEntries = FunctionDeclaration(
     ],
   ),
 );
+final declarationUpdateJournalEntry = FunctionDeclaration(
+  'updateJournalEntry',
+  'Updates a new journal entry, Only update the parts that the user has requested to be updated. Use the existing id of the journal entry.',
+  Schema(
+    SchemaType.object,
+    properties: {
+      'userId': Schema(SchemaType.string, description: 'The id of the user.'),
+      'id': Schema(SchemaType.string,
+          description: 'The existing id of the journal entry.'),
+      'title': Schema(SchemaType.string,
+          description:
+              'The title of the journal entry. Leave it just like the user wants it.'),
+      'entry': Schema(SchemaType.string,
+          description:
+              'The entire journal entry provided by the user. Leave everything the way the user wants it.'),
+      'summary': Schema(SchemaType.string,
+          description:
+              'The entire journal entry summarized in one sentence max. You will create this, NOT the user. Do not ask for the summary.'),
+    },
+    requiredProperties: [
+      'userId',
+      'id',
+      'title',
+      'entry',
+      'summary',
+    ],
+  ),
+);
+
 // NOTES
 final declarationCreateNote = FunctionDeclaration(
   'createNote',
@@ -151,6 +181,29 @@ final declarationCreateNote = FunctionDeclaration(
               'Do not ask the user to provide a summary. You need to create the summary based on the title and the note itself. One sentence.'),
     },
     requiredProperties: ['userId', 'folder', 'title', 'note', 'summary'],
+  ),
+);
+final declarationUpdateNote = FunctionDeclaration(
+  'updateNote',
+  'Updates a note using the information provided by the user.',
+  Schema(
+    SchemaType.object,
+    properties: {
+      'userId': Schema(SchemaType.string, description: 'The id of the user.'),
+      'id': Schema(SchemaType.string,
+          description: 'The existing id of the note.'),
+      'folder': Schema(SchemaType.string,
+          description: 'The name of the folder the user has provided.'),
+      'title': Schema(SchemaType.string,
+          description: 'The title of this note that the user has provided.'),
+      'note': Schema(SchemaType.string,
+          description:
+              'All note content provided by the user in its exact form. Only do simple spell check, nothing else.'),
+      'summary': Schema(SchemaType.string,
+          description:
+              'Do not ask the user to provide a summary. You need to create the summary based on the title and the note itself. One sentence.'),
+    },
+    requiredProperties: ['userId', 'id', 'folder', 'title', 'note', 'summary'],
   ),
 );
 final declarationGetAllNotes = FunctionDeclaration(
@@ -216,11 +269,13 @@ List<FunctionDeclaration> declarationList = [
   declarationUpdateTask,
   declarationGetTasks,
   declarationCreateJournalEntry,
+  declarationUpdateJournalEntry,
   declarationGetAllJournalEntries,
   declarationCreateNote,
+  declarationUpdateNote,
   declarationGetAllNotes,
   declarationCreateFlashcards,
-  declarationGetAllFlashcards
+  declarationGetAllFlashcards,
 ];
 
 //
@@ -230,11 +285,13 @@ final functionMap = {
   'updateTask': onUpdateTask,
   'getTasks': onGetTasks,
   'createJournalEntry': onCreateJournalEntry,
+  'updateJournalEntry': onUpdateJournalEntry,
   'getAllJournalEntries': onGetAllJournalEntries,
   'createNote': onCreateNote,
+  'updateNote': onUpdateNote,
   'getAllNotes': onGetAllNotes,
   'createFlashcards': onCreateFlashcards,
-  'getAllFlashcards': onGetAllFlashcards
+  'getAllFlashcards': onGetAllFlashcards,
 };
 
 // TASKS
@@ -336,6 +393,23 @@ Future<String> onCreateJournalEntry(args, chat) async {
   }
 }
 
+Future<String> onUpdateJournalEntry(args, chat) async {
+  print("UPDATE JOURNAL ENTRY");
+
+  final success = await firebase_UpdateDocument(
+      '${appName}_JournalEntries', args['id'], args);
+
+  if (success) {
+    final response = await coco_SendChat(
+        chat,
+        'The journal entry was updated and stored in the database with an id of ${args['id']}. Do not tell the user the id, but remember it for future reference. Let the user know that the journal entry was updated and ask what else you can do for them.',
+        functionMap);
+    return response!;
+  } else {
+    return 'Something went wrong. The journal entry was not created.';
+  }
+}
+
 Future<String> onGetAllJournalEntries(args, chat) async {
   print('THESE ARE THE ARGS');
   print(args);
@@ -383,6 +457,21 @@ Future<String> onCreateNote(args, chat) async {
     return response!;
   } else {
     return 'Something went wrong. The note was not created.';
+  }
+}
+
+Future<String> onUpdateNote(args, chat) async {
+  print("UPDATE NOTE");
+  final success =
+      await firebase_UpdateDocument('${appName}_Notes', args['id'], args);
+  if (success) {
+    final response = await coco_SendChat(
+        chat,
+        'The note was updated and stored in the database. Do not tell the user the id, but remember it for future reference. Let the user know that the note was updated and ask what else you can do for them.',
+        functionMap);
+    return response!;
+  } else {
+    return 'Something went wrong. The task was not updated.';
   }
 }
 

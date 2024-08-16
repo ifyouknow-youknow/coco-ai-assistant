@@ -10,7 +10,7 @@ class DataMaster {
   late String _userId;
 
   // COLORS
-  String backgroundColor = '#0D1116';
+  String backgroundColor = '#000000';
 
   //STRINGS
   String _priority = "LOW";
@@ -22,6 +22,7 @@ class DataMaster {
   bool _toggleShowOptions = false;
   bool _toggleShowType = false;
   bool _toggleAlert = false;
+  bool _toggleEditTask = false;
   //
   bool _toggleTasksWidget = false;
   bool _toggleJournalEntriesWidget = false;
@@ -61,6 +62,7 @@ class DataMaster {
   bool get toggleShowOptions => _toggleShowOptions;
   bool get toggleShowType => _toggleShowType;
   bool get toggleAlert => _toggleAlert;
+  bool get toggleEditTask => _toggleEditTask;
   //
   bool get toggleTasksWidget => _toggleTasksWidget;
   bool get toggleJournalEntriesWidget => _toggleJournalEntriesWidget;
@@ -103,6 +105,7 @@ class DataMaster {
   void setToggleShowOptions(bool value) => _toggleShowOptions = value;
   void setToggleShowType(bool value) => _toggleShowType = value;
   void setToggleAlert(bool value) => _toggleAlert = value;
+  void setToggleEditTask(bool value) => _toggleEditTask = value;
   //
   void setToggleTasksWidget(bool value) => _toggleTasksWidget = value;
   void setToggleJournalEntriesWidget(bool value) =>
@@ -159,14 +162,16 @@ class DataMaster {
       _folderTextController = TextEditingController();
 
   // DISPOSE
-  void dispose_chatTextController() => _chatTextController.dispose();
-  void dispose_taskTextController() => _taskTextController.dispose();
-  void dispose_categoryTextController() => _categoryTextController.dispose();
-  void dispose_dateTextController() => _dateTextController.dispose();
-  void dispose_titleTextController() => _titleTextController.dispose();
-  void dispose_entryTextController() => _entryTextController.dispose();
-  void dispose_noteTextController() => _noteTextController.dispose();
-  void dispose_folderTextController() => _folderTextController.dispose();
+  void disposeAll() {
+    _chatTextController.dispose();
+    _taskTextController.dispose();
+    _categoryTextController.dispose();
+    _dateTextController.dispose();
+    _titleTextController.dispose();
+    _entryTextController.dispose();
+    _noteTextController.dispose();
+    _folderTextController.dispose();
+  }
 
   // FUNCTIONS
   Future<List<dynamic>> getTasks(DateTime date) async {

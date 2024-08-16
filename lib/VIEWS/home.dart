@@ -1,5 +1,7 @@
 import 'package:coco_ai_assistant/COMPONENTS/blur_view.dart';
+import 'package:coco_ai_assistant/COMPONENTS/border_view.dart';
 import 'package:coco_ai_assistant/COMPONENTS/button_view.dart';
+import 'package:coco_ai_assistant/COMPONENTS/image_view.dart';
 import 'package:coco_ai_assistant/COMPONENTS/roundedcorners_view.dart';
 import 'package:coco_ai_assistant/COMPONENTS/scrollable_view.dart';
 import 'package:coco_ai_assistant/COMPONENTS/textfield_view.dart';
@@ -7,10 +9,10 @@ import 'package:coco_ai_assistant/FUNCTIONS/nav.dart';
 import 'package:coco_ai_assistant/MASTER/datamaster.dart';
 import 'package:coco_ai_assistant/MODELS/firebase.dart';
 import 'package:coco_ai_assistant/MODELS/screen.dart';
-import 'package:coco_ai_assistant/VIEWS/WIDGETS/flashcards_widget.dart';
-import 'package:coco_ai_assistant/VIEWS/WIDGETS/journal_widget.dart';
-import 'package:coco_ai_assistant/VIEWS/WIDGETS/notes_widget.dart';
-import 'package:coco_ai_assistant/VIEWS/WIDGETS/tasks_widget.dart';
+import 'package:coco_ai_assistant/VIEWS/WIDGETS/Flashcards/flashcards_widget.dart';
+import 'package:coco_ai_assistant/VIEWS/WIDGETS/Journal/journal_widget.dart';
+import 'package:coco_ai_assistant/VIEWS/WIDGETS/Notes/notes_widget.dart';
+import 'package:coco_ai_assistant/VIEWS/WIDGETS/Tasks/tasks_widget.dart';
 import 'package:coco_ai_assistant/VIEWS/coco_type.dart';
 import 'package:coco_ai_assistant/VIEWS/signup.dart';
 import 'package:flutter/material.dart';
@@ -41,8 +43,14 @@ class _HomeState extends State<Home> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    // TODO: implement initState
+    super.initState();
     init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: hexToColor(widget.dm.backgroundColor),
       body: Stack(
@@ -61,20 +69,31 @@ class _HomeState extends State<Home> {
                 const PaddingView(
                   paddingTop: 0,
                   paddingBottom: 0,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextView(
-                        text: 'hello, my name is Coco..',
-                        color: Colors.white,
-                        font: 'inconsolata',
-                        size: 17,
-                        weight: FontWeight.w500,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextView(
+                            text: 'hello, my name is Coco..',
+                            color: Colors.white,
+                            font: 'inconsolata',
+                            size: 17,
+                            weight: FontWeight.w500,
+                          ),
+                          TextView(
+                            text: 'ver. 1.1',
+                            color: Colors.white70,
+                            font: 'inconsolata',
+                          )
+                        ],
                       ),
-                      TextView(
-                        text: 'ver. 1.1',
-                        color: Colors.white70,
-                        font: 'inconsolata',
+                      ImageView(
+                        imagePath: 'assets/coco-smile.gif',
+                        width: 60,
+                        height: 60,
+                        objectFit: BoxFit.contain,
                       )
                     ],
                   ),
@@ -86,13 +105,27 @@ class _HomeState extends State<Home> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        TasksWidget(
-                          dm: widget.dm,
+                        BorderView(
+                          bottom: true,
+                          bottomColor: Colors.white30,
+                          child: TasksWidget(
+                            dm: widget.dm,
+                          ),
                         ),
-                        NotesWidget(dm: widget.dm),
-                        FlashcardsWidget(dm: widget.dm),
-                        JournalWiget(
-                          dm: widget.dm,
+                        BorderView(
+                            bottom: true,
+                            bottomColor: Colors.white30,
+                            child: NotesWidget(dm: widget.dm)),
+                        BorderView(
+                            bottom: true,
+                            bottomColor: Colors.white30,
+                            child: FlashcardsWidget(dm: widget.dm)),
+                        BorderView(
+                          bottom: true,
+                          bottomColor: Colors.white30,
+                          child: JournalWiget(
+                            dm: widget.dm,
+                          ),
                         ),
                         const SizedBox(
                           height: 100,
@@ -112,55 +145,83 @@ class _HomeState extends State<Home> {
             Positioned(
               bottom: 40,
               right: 12,
-              child: Column(
-                children: [
-                  Row(
+              child: BlurView(
+                child: PaddingView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      ButtonView(
-                          child: const TextView(
-                            text: 'voice command',
-                            size: 22,
-                            color: Colors.white,
-                            font: 'inconsolata',
+                      Row(
+                        children: [
+                          ButtonView(
+                              child: const TextView(
+                                text: 'voice command',
+                                size: 22,
+                                color: Colors.white,
+                                font: 'inconsolata',
+                              ),
+                              onPress: () {
+                                setState(() {
+                                  widget.dm.setToggleShowOptions(false);
+                                });
+                              }),
+                          const SizedBox(
+                            width: 10,
                           ),
-                          onPress: () {
-                            setState(() {
-                              widget.dm.setToggleShowOptions(false);
-                            });
-                          }),
-                      const SizedBox(
-                        width: 10,
+                          const Icon(Icons.keyboard_double_arrow_right,
+                              color: Colors.white)
+                        ],
                       ),
-                      const Icon(Icons.keyboard_double_arrow_right,
-                          color: Colors.white)
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      Row(
+                        children: [
+                          ButtonView(
+                              child: const TextView(
+                                text: 'type command',
+                                size: 22,
+                                color: Colors.white,
+                                font: 'inconsolata',
+                              ),
+                              onPress: () {
+                                setState(() {
+                                  widget.dm.setToggleShowOptions(false);
+                                });
+                                nav_Push(context, CocoType(dm: widget.dm));
+                              }),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          const Icon(Icons.keyboard_double_arrow_right,
+                              color: Colors.white)
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      Row(
+                        children: [
+                          ButtonView(
+                              child: const TextView(
+                                text: 'close',
+                                size: 22,
+                                color: Colors.white,
+                                font: 'inconsolata',
+                              ),
+                              onPress: () {
+                                setState(() {
+                                  widget.dm.setToggleShowOptions(false);
+                                });
+                              }),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          const Icon(Icons.close, color: Colors.white)
+                        ],
+                      ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  Row(
-                    children: [
-                      ButtonView(
-                          child: const TextView(
-                            text: 'type command',
-                            size: 22,
-                            color: Colors.white,
-                            font: 'inconsolata',
-                          ),
-                          onPress: () {
-                            setState(() {
-                              widget.dm.setToggleShowOptions(false);
-                            });
-                            nav_Push(context, CocoType(dm: widget.dm));
-                          }),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      const Icon(Icons.keyboard_double_arrow_right,
-                          color: Colors.white)
-                    ],
-                  ),
-                ],
+                ),
               ),
             ),
           if (!widget.dm.toggleShowOptions)

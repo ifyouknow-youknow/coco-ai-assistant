@@ -1,4 +1,5 @@
 import 'package:coco_ai_assistant/COMPONENTS/border_view.dart';
+import 'package:coco_ai_assistant/COMPONENTS/image_view.dart';
 import 'package:coco_ai_assistant/FUNCTIONS/colors.dart';
 import 'package:coco_ai_assistant/FUNCTIONS/date.dart';
 import 'package:coco_ai_assistant/FUNCTIONS/misc.dart';
@@ -27,8 +28,12 @@ class _CocoTypeState extends State<CocoType> {
   String _copiedText = "";
   //
   bool _toggleCopied = false;
+  bool isThinking = false;
 
   void onCoco() async {
+    setState(() {
+      isThinking = true;
+    });
     final tempCommand = widget.dm.chatTextController.text;
     widget.dm.chatTextController.clear();
 
@@ -53,6 +58,7 @@ class _CocoTypeState extends State<CocoType> {
       };
       setState(() {
         widget.dm.addToResponses(cocoRes);
+        isThinking = false;
       });
     }
   }
@@ -70,12 +76,6 @@ class _CocoTypeState extends State<CocoType> {
     widget.dm.init_chatTextController();
     _init();
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    widget.dm.dispose_chatTextController();
-    super.dispose();
   }
 
   @override

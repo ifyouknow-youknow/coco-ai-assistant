@@ -18,14 +18,12 @@ void main() async {
   messaging_SetUp();
   await dotenv.load(fileName: "lib/.env");
   final user = await auth_CheckUser();
-  print(user);
-  final dm = DataMaster();
   runApp(MaterialApp(
     home: user != null
         ? Home(
-            dm: dm,
+            dm: DataMaster(),
           )
-        : SignUp(dm: dm),
+        : SignUp(dm: DataMaster()),
     // initialRoute: "/",
     // routes: {
     //   // "/": (context) => const PlaygroundView(),
