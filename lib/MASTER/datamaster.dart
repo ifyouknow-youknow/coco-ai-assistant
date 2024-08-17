@@ -28,6 +28,7 @@ class DataMaster {
   bool _toggleJournalEntriesWidget = false;
   bool _toggleNotesWidget = false;
   bool _toggleFlashcardsWidget = false;
+  bool _toggleGroceryWidget = false;
 
   // CONTROLLERS
   late TextEditingController _chatTextController;
@@ -38,6 +39,9 @@ class DataMaster {
   late TextEditingController _titleTextController;
   late TextEditingController _noteTextController;
   late TextEditingController _folderTextController;
+  late TextEditingController _itemsController;
+  late TextEditingController _frontController;
+  late TextEditingController _backController;
 
 // LISTS
   List<Map<String, dynamic>> _responses = [];
@@ -68,6 +72,7 @@ class DataMaster {
   bool get toggleJournalEntriesWidget => _toggleJournalEntriesWidget;
   bool get toggleNotesWidget => _toggleNotesWidget;
   bool get toggleFlashcardsWidget => _toggleFlashcardsWidget;
+  bool get toggleGroceryWidget => _toggleGroceryWidget;
 
   // STRINGS
   String get userId => _userId;
@@ -93,6 +98,9 @@ class DataMaster {
   TextEditingController get entryTextController => _entryTextController;
   TextEditingController get noteTextController => _noteTextController;
   TextEditingController get folderTextController => _folderTextController;
+  TextEditingController get itemsController => _itemsController;
+  TextEditingController get frontController => _frontController;
+  TextEditingController get backController => _backController;
 
   // MISC
   ChatSession get chat => _chat;
@@ -112,6 +120,7 @@ class DataMaster {
       _toggleJournalEntriesWidget = value;
   void setToggleNotesWidget(bool value) => _toggleNotesWidget = value;
   void setToggleFlashcardsWidget(bool value) => _toggleFlashcardsWidget = value;
+  void setToggleGroceryWidget(bool value) => _toggleGroceryWidget = value;
   //
   void setChat(ChatSession value) => _chat = value;
   void setPriority(String value) => _priority = value;
@@ -160,6 +169,9 @@ class DataMaster {
       _noteTextController = TextEditingController();
   void init_folderTextController() =>
       _folderTextController = TextEditingController();
+  void init_itemsController() => _itemsController = TextEditingController();
+  void init_frontController() => _frontController = TextEditingController();
+  void init_backController() => _backController = TextEditingController();
 
   // DISPOSE
   void disposeAll() {
@@ -171,6 +183,9 @@ class DataMaster {
     _entryTextController.dispose();
     _noteTextController.dispose();
     _folderTextController.dispose();
+    _itemsController.dispose();
+    _frontController.dispose();
+    _backController.dispose();
   }
 
   // FUNCTIONS
@@ -245,6 +260,19 @@ class DataMaster {
   Future<List<dynamic>> getFlashcards() async {
     final docs =
         await firebase_GetAllDocumentsQueried('${appName}_Flashcards', [
+      {'field': 'userId', 'operator': '==', 'value': userId},
+    ]);
+    if (docs.isNotEmpty) {
+      // REPLACE THIS
+      return docs;
+    } else {
+      return [];
+    }
+  }
+
+  Future<List<dynamic>> getGroceryLists() async {
+    final docs =
+        await firebase_GetAllDocumentsQueried('${appName}_GroceryLists', [
       {'field': 'userId', 'operator': '==', 'value': userId},
     ]);
     if (docs.isNotEmpty) {

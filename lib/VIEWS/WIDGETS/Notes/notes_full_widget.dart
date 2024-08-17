@@ -333,6 +333,7 @@ class _NotesFullWidgetState extends State<NotesFullWidget> {
                   ButtonView(
                       child: const TextView(
                         text: 'Close',
+                        wrap: false,
                       ),
                       onPress: () {
                         setState(() {

@@ -106,6 +106,7 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
                     future: _fetchFlashcards(),
                     childBuilder: (data) {
                       return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           for (var stack
                               in sortArrayByProperty(data, 'date', desc: true)

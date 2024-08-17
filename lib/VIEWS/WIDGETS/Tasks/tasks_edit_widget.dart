@@ -57,7 +57,7 @@ class _TasksEditWidgetState extends State<TasksEditWidget> {
         _priority.isEmpty) {
       setState(() {
         widget.dm.setAlertTitle('Missing Info');
-        widget.dm.setAlertText('Please provide all parts to create this task.');
+        widget.dm.setAlertText('Please provide all parts to update this task.');
         widget.dm.setToggleAlert(true);
       });
       return;
@@ -92,202 +92,198 @@ class _TasksEditWidgetState extends State<TasksEditWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: hexToColor("#222028"),
+      backgroundColor: hexToColor(widget.dm.backgroundColor),
       body: Stack(
         children: [
-          Container(
-            color: hexToColor("#12161D"),
-            height: getHeight(context),
-            child: SingleChildScrollView(
-              child: PaddingView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      height: 50,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const TextView(
-                          text: 'edit task',
-                          size: 24,
-                          color: Colors.white,
-                          font: 'inconsolata',
-                          weight: FontWeight.w500,
-                        ),
-                        ButtonView(
-                            child: const Row(
-                              children: [
-                                TextView(
-                                  text: "close",
-                                  size: 20,
-                                  font: 'inconsolata',
-                                  color: Colors.white,
-                                ),
-                                SizedBox(
-                                  width: 8,
-                                ),
-                                Icon(
-                                  Icons.close,
-                                  size: 24,
-                                  color: Colors.white,
-                                )
-                              ],
-                            ),
-                            onPress: () {
-                              nav_Pop(context);
-                            })
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // TASK
-                        const TextView(
-                          text: 'task',
-                          color: Colors.white,
-                          size: 18,
-                          font: 'inconsolata',
-                          weight: FontWeight.w700,
-                        ),
-                        BorderView(
-                          bottom: true,
-                          bottomColor: Colors.white,
-                          bottomWidth: 1,
-                          child: TextfieldView(
-                            controller: widget.dm.taskTextController,
-                            backgroundColor: Colors.transparent,
-                            color: Colors.white,
-                            placeholderColor: Colors.white60,
-                            size: 20,
-                            maxLines: 5,
-                            placeholder: 'ex. create a bagel for everything.',
-                            multiline: true,
-                            isCap: true,
-                            isAutoCorrect: true,
+          SingleChildScrollView(
+            child: PaddingView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    height: 50,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const TextView(
+                        text: 'edit task',
+                        size: 24,
+                        color: Colors.white,
+                        font: 'inconsolata',
+                        weight: FontWeight.w500,
+                      ),
+                      ButtonView(
+                          child: const Row(
+                            children: [
+                              TextView(
+                                text: "close",
+                                size: 20,
+                                font: 'inconsolata',
+                                color: Colors.white,
+                              ),
+                              SizedBox(
+                                width: 8,
+                              ),
+                              Icon(
+                                Icons.close,
+                                size: 24,
+                                color: Colors.white,
+                              )
+                            ],
                           ),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        // CATEGORY
-                        const TextView(
-                          text: 'category',
+                          onPress: () {
+                            nav_Pop(context);
+                          })
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // TASK
+                      const TextView(
+                        text: 'task',
+                        color: Colors.white,
+                        size: 18,
+                        font: 'inconsolata',
+                        weight: FontWeight.w700,
+                      ),
+                      BorderView(
+                        bottom: true,
+                        bottomColor: Colors.white,
+                        bottomWidth: 1,
+                        child: TextfieldView(
+                          controller: widget.dm.taskTextController,
+                          backgroundColor: Colors.transparent,
                           color: Colors.white,
-                          size: 18,
-                          font: 'inconsolata',
-                          weight: FontWeight.w700,
+                          placeholderColor: Colors.white60,
+                          size: 20,
+                          maxLines: 5,
+                          placeholder: 'ex. create a bagel for everything.',
+                          multiline: true,
+                          isCap: true,
+                          isAutoCorrect: true,
                         ),
-                        BorderView(
-                          bottom: true,
-                          bottomColor: Colors.white,
-                          bottomWidth: 1,
-                          child: TextfieldView(
-                            controller: widget.dm.categoryTextController,
-                            backgroundColor: Colors.transparent,
-                            color: Colors.white,
-                            placeholderColor: Colors.white60,
-                            size: 20,
-                            maxLines: 1,
-                            placeholder:
-                                'ex. school work, personal, bagel project..',
-                            isCap: true,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        // DATE
-                        const TextView(
-                          text: 'date',
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      // CATEGORY
+                      const TextView(
+                        text: 'category',
+                        color: Colors.white,
+                        size: 18,
+                        font: 'inconsolata',
+                        weight: FontWeight.w700,
+                      ),
+                      BorderView(
+                        bottom: true,
+                        bottomColor: Colors.white,
+                        bottomWidth: 1,
+                        child: TextfieldView(
+                          controller: widget.dm.categoryTextController,
+                          backgroundColor: Colors.transparent,
                           color: Colors.white,
-                          size: 18,
-                          font: 'inconsolata',
-                          weight: FontWeight.w700,
+                          placeholderColor: Colors.white60,
+                          size: 20,
+                          maxLines: 1,
+                          placeholder:
+                              'ex. school work, personal, bagel project..',
+                          isCap: true,
                         ),
-                        BorderView(
-                          bottom: true,
-                          bottomColor: Colors.white,
-                          bottomWidth: 1,
-                          child: TextfieldView(
-                            controller: widget.dm.dateTextController,
-                            backgroundColor: Colors.transparent,
-                            color: Colors.white,
-                            placeholderColor: Colors.white60,
-                            size: 20,
-                            maxLines: 5,
-                            placeholder: 'ex. today, 12/25/1995, July 25..',
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        // DATE
-                        const TextView(
-                          text: 'priority',
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      // DATE
+                      const TextView(
+                        text: 'date',
+                        color: Colors.white,
+                        size: 18,
+                        font: 'inconsolata',
+                        weight: FontWeight.w700,
+                      ),
+                      BorderView(
+                        bottom: true,
+                        bottomColor: Colors.white,
+                        bottomWidth: 1,
+                        child: TextfieldView(
+                          controller: widget.dm.dateTextController,
+                          backgroundColor: Colors.transparent,
                           color: Colors.white,
-                          size: 18,
-                          font: 'inconsolata',
-                          weight: FontWeight.w700,
+                          placeholderColor: Colors.white60,
+                          size: 20,
+                          maxLines: 5,
+                          placeholder: 'ex. today, 12/25/1995, July 25..',
                         ),
-                        DropdownView(
-                            defaultValue: widget.dm.priority,
-                            items: const ['LOW', 'MEDIUM', 'HIGH'],
-                            backgroundColor: hexToColor("#12161D"),
-                            textColor: Colors.white,
-                            onChanged: (value) {
-                              setState(() {
-                                widget.dm.setPriority(value);
-                              });
-                            })
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    // BUTTON HERE
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            ButtonView(
-                                child: const Row(
-                                  children: [
-                                    TextView(
-                                      text: 'save changes',
-                                      color: Colors.white,
-                                      size: 21,
-                                      font: 'inconsolata',
-                                    ),
-                                    SizedBox(
-                                      width: 8,
-                                    ),
-                                    Icon(
-                                      Icons.save_outlined,
-                                      color: Colors.white,
-                                    )
-                                  ],
-                                ),
-                                onPress: () {
-                                  onUpdateTask();
-                                })
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 35,
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 100,
-                    )
-                  ],
-                ),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      // DATE
+                      const TextView(
+                        text: 'priority',
+                        color: Colors.white,
+                        size: 18,
+                        font: 'inconsolata',
+                        weight: FontWeight.w700,
+                      ),
+                      DropdownView(
+                          defaultValue: widget.dm.priority,
+                          items: const ['LOW', 'MEDIUM', 'HIGH'],
+                          backgroundColor: hexToColor("#12161D"),
+                          textColor: Colors.white,
+                          onChanged: (value) {
+                            setState(() {
+                              widget.dm.setPriority(value);
+                            });
+                          })
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  // BUTTON HERE
+                  Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ButtonView(
+                              child: const Row(
+                                children: [
+                                  TextView(
+                                    text: 'save changes',
+                                    color: Colors.white,
+                                    size: 21,
+                                    font: 'inconsolata',
+                                  ),
+                                  SizedBox(
+                                    width: 8,
+                                  ),
+                                  Icon(
+                                    Icons.save_outlined,
+                                    color: Colors.white,
+                                  )
+                                ],
+                              ),
+                              onPress: () {
+                                onUpdateTask();
+                              })
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 35,
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 100,
+                  )
+                ],
               ),
             ),
           ),
@@ -302,6 +298,7 @@ class _TasksEditWidgetState extends State<TasksEditWidget> {
                   ButtonView(
                       child: const TextView(
                         text: 'Close',
+                        wrap: false,
                       ),
                       onPress: () {
                         setState(() {

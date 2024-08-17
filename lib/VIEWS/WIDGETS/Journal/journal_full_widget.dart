@@ -289,6 +289,7 @@ class _JournalFullWidgetState extends State<JournalFullWidget> {
                   ButtonView(
                       child: const TextView(
                         text: 'Close',
+                        wrap: false,
                       ),
                       onPress: () {
                         setState(() {

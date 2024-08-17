@@ -66,7 +66,7 @@ class _NotesEditWidgetState extends State<NotesEditWidget> {
     if (_title.isEmpty || _note.isEmpty || _folder.isEmpty) {
       setState(() {
         widget.dm.setAlertTitle('Missing Info');
-        widget.dm.setAlertText('Please provide all parts to create this task.');
+        widget.dm.setAlertText('Please provide all parts to update this note.');
         widget.dm.setToggleAlert(true);
       });
       return;
@@ -94,206 +94,203 @@ class _NotesEditWidgetState extends State<NotesEditWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: hexToColor("#222028"),
+      backgroundColor: hexToColor(widget.dm.backgroundColor),
       body: Stack(
         children: [
-          Container(
-            color: hexToColor("#12161D"),
-            child: SingleChildScrollView(
-              child: PaddingView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      height: 50,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const TextView(
-                          text: 'edit note',
-                          size: 24,
+          SingleChildScrollView(
+            child: PaddingView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    height: 50,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const TextView(
+                        text: 'edit note',
+                        size: 24,
+                        color: Colors.white,
+                        font: 'inconsolata',
+                        weight: FontWeight.w500,
+                      ),
+                      ButtonView(
+                          child: const Row(
+                            children: [
+                              TextView(
+                                text: "close",
+                                size: 20,
+                                font: 'inconsolata',
+                                color: Colors.white,
+                              ),
+                              SizedBox(
+                                width: 8,
+                              ),
+                              Icon(
+                                Icons.close,
+                                size: 24,
+                                color: Colors.white,
+                              )
+                            ],
+                          ),
+                          onPress: () {
+                            nav_Pop(context);
+                          })
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // TASK
+                      const TextView(
+                        text: 'title',
+                        color: Colors.white,
+                        size: 18,
+                        font: 'inconsolata',
+                        weight: FontWeight.w700,
+                      ),
+                      BorderView(
+                        bottom: true,
+                        bottomColor: Colors.white,
+                        bottomWidth: 1,
+                        child: TextfieldView(
+                          controller: widget.dm.titleTextController,
+                          backgroundColor: Colors.transparent,
                           color: Colors.white,
-                          font: 'inconsolata',
-                          weight: FontWeight.w500,
+                          placeholderColor: Colors.white60,
+                          size: 20,
+                          maxLines: 5,
+                          placeholder: 'ex. an entrance to the bagel.',
                         ),
-                        ButtonView(
-                            child: const Row(
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      const TextView(
+                        text: 'folder',
+                        color: Colors.white,
+                        size: 18,
+                        font: 'inconsolata',
+                        weight: FontWeight.w700,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: BorderView(
+                              bottom: true,
+                              bottomColor: Colors.white,
+                              bottomWidth: 1,
+                              child: TextfieldView(
+                                controller: widget.dm.folderTextController,
+                                backgroundColor: Colors.transparent,
+                                color: Colors.white,
+                                placeholderColor: Colors.white60,
+                                size: 20,
+                                maxLines: 5,
+                                placeholder: 'name of the folder',
+                              ),
+                            ),
+                          ),
+                          if (_folders.isNotEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                TextView(
-                                  text: "close",
-                                  size: 20,
+                                const TextView(
+                                  text: 'folders',
+                                  color: Colors.white,
+                                  size: 18,
                                   font: 'inconsolata',
-                                  color: Colors.white,
+                                  weight: FontWeight.w700,
                                 ),
-                                SizedBox(
-                                  width: 8,
+                                DropdownView(
+                                  defaultValue: widget.note['folder'],
+                                  backgroundColor: hexToColor("#12161D"),
+                                  items: _folders,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      widget.dm.folderTextController.text =
+                                          value;
+                                    });
+                                  },
+                                  textColor: Colors.white,
                                 ),
-                                Icon(
-                                  Icons.close,
-                                  size: 24,
-                                  color: Colors.white,
-                                )
                               ],
                             ),
-                            onPress: () {
-                              nav_Pop(context);
-                            })
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // TASK
-                        const TextView(
-                          text: 'title',
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      // CATEGORY
+                      const TextView(
+                        text: 'note',
+                        color: Colors.white,
+                        size: 18,
+                        font: 'inconsolata',
+                        weight: FontWeight.w700,
+                      ),
+                      BorderView(
+                        bottom: true,
+                        bottomColor: Colors.white,
+                        bottomWidth: 1,
+                        child: TextfieldView(
+                          controller: widget.dm.noteTextController,
+                          backgroundColor: Colors.transparent,
                           color: Colors.white,
-                          size: 18,
-                          font: 'inconsolata',
-                          weight: FontWeight.w700,
+                          placeholderColor: Colors.white60,
+                          size: 20,
+                          maxLines: 20,
+                          placeholder: 'type your note here..',
+                          multiline: true,
                         ),
-                        BorderView(
-                          bottom: true,
-                          bottomColor: Colors.white,
-                          bottomWidth: 1,
-                          child: TextfieldView(
-                            controller: widget.dm.titleTextController,
-                            backgroundColor: Colors.transparent,
-                            color: Colors.white,
-                            placeholderColor: Colors.white60,
-                            size: 20,
-                            maxLines: 5,
-                            placeholder: 'ex. an entrance to the bagel.',
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        const TextView(
-                          text: 'folder',
-                          color: Colors.white,
-                          size: 18,
-                          font: 'inconsolata',
-                          weight: FontWeight.w700,
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: BorderView(
-                                bottom: true,
-                                bottomColor: Colors.white,
-                                bottomWidth: 1,
-                                child: TextfieldView(
-                                  controller: widget.dm.folderTextController,
-                                  backgroundColor: Colors.transparent,
-                                  color: Colors.white,
-                                  placeholderColor: Colors.white60,
-                                  size: 20,
-                                  maxLines: 5,
-                                  placeholder: 'name of the folder',
-                                ),
-                              ),
-                            ),
-                            if (_folders.isNotEmpty)
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  // BUTTON HERE
+                  Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ButtonView(
+                              child: const Row(
                                 children: [
-                                  const TextView(
-                                    text: 'folders',
+                                  TextView(
+                                    text: 'save changes',
                                     color: Colors.white,
-                                    size: 18,
+                                    size: 21,
                                     font: 'inconsolata',
-                                    weight: FontWeight.w700,
                                   ),
-                                  DropdownView(
-                                    defaultValue: widget.note['folder'],
-                                    backgroundColor: hexToColor("#12161D"),
-                                    items: _folders,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        widget.dm.folderTextController.text =
-                                            value;
-                                      });
-                                    },
-                                    textColor: Colors.white,
+                                  SizedBox(
+                                    width: 8,
                                   ),
+                                  Icon(
+                                    Icons.save_outlined,
+                                    color: Colors.white,
+                                  )
                                 ],
                               ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        // CATEGORY
-                        const TextView(
-                          text: 'note',
-                          color: Colors.white,
-                          size: 18,
-                          font: 'inconsolata',
-                          weight: FontWeight.w700,
-                        ),
-                        BorderView(
-                          bottom: true,
-                          bottomColor: Colors.white,
-                          bottomWidth: 1,
-                          child: TextfieldView(
-                            controller: widget.dm.noteTextController,
-                            backgroundColor: Colors.transparent,
-                            color: Colors.white,
-                            placeholderColor: Colors.white60,
-                            size: 20,
-                            maxLines: 20,
-                            placeholder: 'type your note here..',
-                            multiline: true,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    // BUTTON HERE
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            ButtonView(
-                                child: const Row(
-                                  children: [
-                                    TextView(
-                                      text: 'save changes',
-                                      color: Colors.white,
-                                      size: 21,
-                                      font: 'inconsolata',
-                                    ),
-                                    SizedBox(
-                                      width: 8,
-                                    ),
-                                    Icon(
-                                      Icons.save_outlined,
-                                      color: Colors.white,
-                                    )
-                                  ],
-                                ),
-                                onPress: () {
-                                  onUpdateNote();
-                                })
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 35,
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 100,
-                    )
-                  ],
-                ),
+                              onPress: () {
+                                onUpdateNote();
+                              })
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 35,
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 100,
+                  )
+                ],
               ),
             ),
           ),
@@ -308,6 +305,7 @@ class _NotesEditWidgetState extends State<NotesEditWidget> {
                   ButtonView(
                       child: const TextView(
                         text: 'Close',
+                        wrap: false,
                       ),
                       onPress: () {
                         setState(() {

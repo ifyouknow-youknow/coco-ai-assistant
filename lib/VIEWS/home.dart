@@ -10,6 +10,7 @@ import 'package:coco_ai_assistant/MASTER/datamaster.dart';
 import 'package:coco_ai_assistant/MODELS/firebase.dart';
 import 'package:coco_ai_assistant/MODELS/screen.dart';
 import 'package:coco_ai_assistant/VIEWS/WIDGETS/Flashcards/flashcards_widget.dart';
+import 'package:coco_ai_assistant/VIEWS/WIDGETS/Grocery/grocery_widget.dart';
 import 'package:coco_ai_assistant/VIEWS/WIDGETS/Journal/journal_widget.dart';
 import 'package:coco_ai_assistant/VIEWS/WIDGETS/Notes/notes_widget.dart';
 import 'package:coco_ai_assistant/VIEWS/WIDGETS/Tasks/tasks_widget.dart';
@@ -124,6 +125,13 @@ class _HomeState extends State<Home> {
                           bottom: true,
                           bottomColor: Colors.white30,
                           child: JournalWiget(
+                            dm: widget.dm,
+                          ),
+                        ),
+                        BorderView(
+                          bottom: true,
+                          bottomColor: Colors.white30,
+                          child: GroceryWidget(
                             dm: widget.dm,
                           ),
                         ),

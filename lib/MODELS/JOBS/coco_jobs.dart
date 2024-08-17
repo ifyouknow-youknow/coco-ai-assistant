@@ -6,11 +6,6 @@ import 'package:coco_ai_assistant/MODELS/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
-const tasksInstructions =
-    'You are a task manager. This job involves creating new tasks, updating tasks, removing tasks, and sharing tasks with other users. Use the provided functions to interact with the main database which stores all of the task data. The user may select another job if they need help with something else.';
-const journalInstructions =
-    'You are a journal manager. Your job is to assist the user in creating, editing, removing journal entries. The user may select another job if they need help with something else.';
-
 // DECLARATIONS
 // TASKS
 final declarationCreateTask = FunctionDeclaration(
@@ -250,7 +245,7 @@ final declarationCreateFlashcards = FunctionDeclaration(
 );
 final declarationGetAllFlashcards = FunctionDeclaration(
   'getAllFlashcards',
-  'Gets all flashcards belonging to the user.',
+  'Gets all flashcards belonging to the user. You can also accept practice or study flashcards as a reason to call this function to get all flashcards.',
   Schema(
     SchemaType.object,
     properties: {
@@ -259,6 +254,64 @@ final declarationGetAllFlashcards = FunctionDeclaration(
     requiredProperties: [
       'userId',
     ],
+  ),
+);
+// GROCERY LIST
+final declarationCreateGroceryList = FunctionDeclaration(
+  'createGroceryList',
+  'Create a grocery list with a title and all items on the list. Make sure to get all grocery items for this list, and confirm if all items are correct. After confirmation, call this function. Give them the example when entering a grocery list item: (ex. 2 lbs tomatoes, 1 can corn, 1 gallon milk...).',
+  Schema(
+    SchemaType.object,
+    properties: {
+      'userId': Schema(SchemaType.string, description: 'The id of the user.'),
+      'title': Schema(SchemaType.string,
+          description: 'The title of the grocery list.'),
+      'items': Schema(
+        SchemaType.array,
+        description: 'An array of grocery items belonging to this list.',
+        items: Schema(
+          SchemaType.string,
+          description: 'A grocery item as a string (e.g., "2 lbs tomatoes").',
+        ),
+      ),
+    },
+    requiredProperties: ['userId', 'title', 'items'],
+  ),
+);
+final declarationGetAllGroceryLists = FunctionDeclaration(
+  'getAllGroceryLists',
+  'Gets all grocery lists belonging to the user. You can also accept show me or pull up my grocery lists as acceptable requests to call this function.',
+  Schema(
+    SchemaType.object,
+    properties: {
+      'userId': Schema(SchemaType.string, description: 'The id of the user.'),
+    },
+    requiredProperties: [
+      'userId',
+    ],
+  ),
+);
+final declarationUpdateGroceryList = FunctionDeclaration(
+  'updateGroceryList',
+  'Update, or change a grocery list based on the user request. They may change the title of the list, or change and remove any item from the grocery list. If you do not know the existing id of the grocery list, call the getAllGroceryLists functions first and ask the user which grocery list they want to update.',
+  Schema(
+    SchemaType.object,
+    properties: {
+      'userId': Schema(SchemaType.string, description: 'The id of the user.'),
+      'id': Schema(SchemaType.string,
+          description: 'The existing id of the grocery list.'),
+      'title': Schema(SchemaType.string,
+          description: 'The title of the grocery list.'),
+      'items': Schema(
+        SchemaType.array,
+        description: 'An array of grocery items belonging to this list.',
+        items: Schema(
+          SchemaType.string,
+          description: 'A grocery item as a string (e.g., "2 lbs tomatoes").',
+        ),
+      ),
+    },
+    requiredProperties: ['userId', 'id', 'title', 'items'],
   ),
 );
 
@@ -276,6 +329,9 @@ List<FunctionDeclaration> declarationList = [
   declarationGetAllNotes,
   declarationCreateFlashcards,
   declarationGetAllFlashcards,
+  declarationCreateGroceryList,
+  declarationGetAllGroceryLists,
+  declarationUpdateGroceryList
 ];
 
 //
@@ -292,6 +348,9 @@ final functionMap = {
   'getAllNotes': onGetAllNotes,
   'createFlashcards': onCreateFlashcards,
   'getAllFlashcards': onGetAllFlashcards,
+  'createGroceryList': onCreateGroceryList,
+  'getAllGroceryLists': onGetAllGroceryLists,
+  'updateGroceryList': onUpdateGroceryList
 };
 
 // TASKS
@@ -519,7 +578,7 @@ Future<String> onCreateFlashcards(args, chat) async {
   if (success) {
     final response = await coco_SendChat(
         chat,
-        'The flashcards stack was created and stored in the database with an id of $id. Do not tell the user the id, but remember it for future reference. Let the user know that the note was created and ask what else you can do for them.',
+        'The flashcards stack was created and stored in the database with an id of $id. Do not tell the user the id, but remember it for future reference. Let the user know that the flashcards stack was created and ask what else you can do for them.',
         functionMap);
     return response!;
   } else {
@@ -547,12 +606,67 @@ Future<String> onGetAllFlashcards(args, chat) async {
     print(newList);
     final response = await coco_SendChat(
         chat,
-        'Turn this JSON into a readable text list format. You do not need to include the id or the userId. JSON: ${jsonEncode(newList)}. Only list the stack names. If they want to view flashcards, ask if they want to view them all or in test mode which means you show them the front card and they give you their answer. Show them the answer (back) and then compare if it is correct or not. Allow them to pass and continue to the next, then come back to it. Once finished, keep track of all correct and incorrect and give them overall score with a full overview of results. Allow randomized or standard order. Also, allow the cards to be reversed, so showing the back card first instead.',
+        'Turn this JSON into a readable text list format. You do not need to include the id or the userId. JSON: ${jsonEncode(newList)}. Only list the stack names. If they want to view flashcards, ask if they want to view them all or in study mode which means you show them the front card and they give you their answer. Show them the answer (back) and then compare if it is correct or not. Allow them to pass and continue to the next, then come back to it at the end. Once finished, keep track of all correct and incorrect answers and give them overall score with a full overview of results. Allow randomized or standard order. Also, allow the cards to be reversed, so showing the back card first instead.',
         functionMap);
     // ADD TO CHAT HISTORY
     print(response);
     return response!;
   } else {
     return 'It seems you do not have any tasks for this day.';
+  }
+}
+
+// GROCERY LISTS
+Future<String> onCreateGroceryList(args, chat) async {
+  print("CREATE GROCERY LIST");
+
+  final id = randomString(25);
+  final success =
+      await firebase_CreateDocument('${appName}_GroceryLists', id, args);
+
+  if (success) {
+    final response = await coco_SendChat(
+        chat,
+        'The grocery list was created and stored in the database with an id of $id. Do not tell the user the id, but remember it for future reference. Let the user know that the grocery list was created and ask what else you can do for them.',
+        functionMap);
+    return response!;
+  } else {
+    return 'Something went wrong. The note was not created.';
+  }
+}
+
+Future<String> onGetAllGroceryLists(args, chat) async {
+  print("GET GROCERY LISTS");
+  final userId = args['userId'];
+
+  final listDocs =
+      await firebase_GetAllDocumentsQueried('${appName}_GroceryLists', [
+    {'field': 'userId', 'operator': '==', 'value': userId},
+  ]);
+  if (listDocs.isNotEmpty) {
+    final response = await coco_SendChat(
+        chat,
+        'Turn this JSON into a readable text list format. You do not need to include the id or the userId. JSON: ${jsonEncode(listDocs)}. First, show them the list of titles before showing them the items. Allow them to see multiple lists at a time upon request.',
+        functionMap);
+    // ADD TO CHAT HISTORY
+    print(response);
+    return response!;
+  } else {
+    return 'It seems you do not have any tasks for this day.';
+  }
+}
+
+Future<String> onUpdateGroceryList(args, chat) async {
+  print("UPDATE GROCERY LIST");
+  final success = await firebase_UpdateDocument(
+      '${appName}_GroceryLists', args['id'], args);
+  if (success) {
+    final response = await coco_SendChat(
+        chat,
+        'The grocery list was updated and stored in the database. Do not tell the user the id, but remember it for future reference. Let the user know that the grocery list was updated and ask what else you can do for them.',
+        functionMap);
+    return response!;
+  } else {
+    return 'Something went wrong. The task was not updated.';
   }
 }

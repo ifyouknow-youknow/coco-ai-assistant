@@ -4,5 +4,8 @@ final main_instructions =
     Tasks Manager,
     Journal Entries Manager,
     Notes Manager,
-    Flashcards Manager.
+    Flashcards Manager,
+    Grocery List Manager,
+
+    or General Question genius.
      ''';
